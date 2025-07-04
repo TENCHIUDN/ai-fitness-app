@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AIトレメニュー</title>
+  <title>AIトレメニュー作成</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -31,8 +31,7 @@
         <option value="体力UP">体力UP（バランス重視）</option>
         <option value="左右差改善">左右差の補正をしたい</option>
       </select>
-    </label>
-    <br><br>
+    </label><br><br>
 
     <label>トレーニング時間（分）：
       <select name="duration" required>
@@ -41,8 +40,7 @@
         <option value="30">30分</option>
         <option value="45">45分</option>
       </select>
-    </label>
-    <br><br>
+    </label><br><br>
 
     <fieldset>
       <legend>トレーニング可能な部位（複数選択OK）</legend>
@@ -50,13 +48,17 @@
       <label><input type="checkbox" name="parts" value="腕"> 腕</label><br>
       <label><input type="checkbox" name="parts" value="脚"> 脚</label><br>
       <label><input type="checkbox" name="parts" value="全身"> 全身</label><br>
-    </fieldset>
-    <br>
+    </fieldset><br>
 
     <button type="submit">メニュー生成</button>
   </form>
 
-  <div id="menuResult" style="white-space: pre-wrap; margin-top: 2rem;"></div>
+  <hr>
+  <div id="resultArea" style="display:none;">
+    <h2>🏋️ 今日のメニュー</h2>
+    <div id="menuBox" style="white-space: pre-wrap;"></div>
+    <button class="print-btn" onclick="window.print()">🖨️ 印刷する</button>
+  </div>
 
   <script>
     document.getElementById("menuForm").addEventListener("submit", function (e) {
@@ -71,27 +73,25 @@
           const res = await fetch("/api/generate-menu", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
           });
 
           const result = await res.json();
-
           if (result.menu) {
-            localStorage.setItem("menu", result.menu);
-            window.location.href = "result.html"; // ← ページ遷移追加！
+            document.getElementById("menuBox").textContent = result.menu;
+            document.getElementById("resultArea").style.display = "block";
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
           } else {
-            alert("メニュー生成に失敗しました");
+            document.getElementById("menuBox").textContent = "メニューが取得できませんでした。";
           }
-
         } catch (err) {
           console.error("通信エラー:", err);
-          alert("エラーが発生しました");
+          document.getElementById("menuBox").textContent = "通信エラーが発生しました。";
         }
       }
 
       handleSubmit();
     });
   </script>
-
 </body>
 </html>
