@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIトレメニュー</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>AIトレメニュー作成フォーム</h1>
+
+  <form id="menuForm">
+    <label>体重（kg）：<input type="number" name="weight" required></label><br>
+    <label>体脂肪率（%）：<input type="number" step="0.1" name="bodyFat" required></label><br><br>
+
+    <fieldset>
+      <legend>部位ごとの筋肉量（kg）</legend>
+      <label>体幹：<input type="number" step="0.1" name="coreMuscle" required></label><br>
+      <label>右腕：<input type="number" step="0.1" name="rightArm" required></label><br>
+      <label>左腕：<input type="number" step="0.1" name="leftArm" required></label><br>
+      <label>右脚：<input type="number" step="0.1" name="rightLeg" required></label><br>
+      <label>左脚：<input type="number" step="0.1" name="leftLeg" required></label><br>
+    </fieldset>
+    <br>
+
+    <label>トレーニング目的：
+      <select name="goal" required>
+        <option value="">選択してください</option>
+        <option value="減量">減量（脂肪を落としたい）</option>
+        <option value="筋肥大">筋肥大（筋肉を増やしたい）</option>
+        <option value="体力UP">体力UP（バランス重視）</option>
+        <option value="左右差改善">左右差の補正をしたい</option>
+      </select>
+    </label>
+    <br><br>
+
+    <label>トレーニング時間（分）：
+      <select name="duration" required>
+        <option value="">選択してください</option>
+        <option value="15">15分</option>
+        <option value="30">30分</option>
+        <option value="45">45分</option>
+      </select>
+    </label>
+    <br><br>
+
+    <fieldset>
+      <legend>トレーニング可能な部位（複数選択OK）</legend>
+      <label><input type="checkbox" name="parts" value="体幹"> 体幹</label><br>
+      <label><input type="checkbox" name="parts" value="腕"> 腕</label><br>
+      <label><input type="checkbox" name="parts" value="脚"> 脚</label><br>
+      <label><input type="checkbox" name="parts" value="全身"> 全身</label><br>
+    </fieldset>
+    <br>
+
+    <button type="submit">メニュー生成</button>
+  </form>
+
+  <div id="menuResult" style="white-space: pre-wrap; margin-top: 2rem;"></div>
+
+  <script>
+    document.getElementById("menuForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      async function handleSubmit() {
+        const form = new FormData(e.target);
+        const data = Object.fromEntries(form.entries());
+        data.parts = form.getAll("parts");
+
+        try {
+          const res = await fetch("/api/generate-menu", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+          });
+
+          const result = await res.json();
+
+          if (result.menu) {
+            localStorage.setItem("menu", result.menu);
+            window.location.href = "result.html"; // ← ページ遷移追加！
+          } else {
+            alert("メニュー生成に失敗しました");
+          }
+
+        } catch (err) {
+          console.error("通信エラー:", err);
+          alert("エラーが発生しました");
+        }
+      }
+
+      handleSubmit();
+    });
+  </script>
+
+</body>
+</html>
