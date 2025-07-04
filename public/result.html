@@ -1,27 +1,19 @@
+<!DOCTYPE html>
+<html lang="ja">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AIトレメニュー</title>
+  <title>今日のAIトレメニュー</title>
   <link rel="stylesheet" href="style.css" />
-</head><body class="receipt">
+</head>
+<body class="receipt">
   <h2>🏋️ 今日のメニュー</h2>
-  <div id="printArea">読み込み中...</div>
+  <div id="menuBox" style="white-space: pre-wrap;">読み込み中...</div>
   <button class="print-btn" onclick="window.print()">🖨️ 印刷する</button>
 
   <script>
-    const rawMenu = localStorage.getItem("menu");
-    const menuBox = document.getElementById("printArea");
-
-    if (rawMenu && rawMenu !== "undefined") {
-      // 改行を <br> に置換、インデントもそのまま表示
-      const formatted = rawMenu
-        .replace(/\n/g, "<br>")
-        .replace(/　/g, "&emsp;"); // ← 全角スペースは &emsp; に置換（2文字分）
-
-      menuBox.innerHTML = formatted;
-    } else {
-      menuBox.textContent = "メニューが見つかりませんでした。";
-    }
-
+    const menu = localStorage.getItem("menu");
+    document.getElementById("menuBox").textContent = menu || "メニューが見つかりませんでした。";
   </script>
 </body>
+</html>
